@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đèn Kéo Quân 3D - Hiệu ứng JavaScript</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts hỗ trợ tiếng Việt chuẩn tuyệt đối (vietnamese subset) & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                        title: ['Montserrat', '"Be Vietnam Pro"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+/* ... existing code ... -->
+    <!-- Header tinh giản -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-900">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-red-600 flex items-center justify-center text-zinc-950 shadow-lg shadow-red-950/50">
+                    <i class="fa-solid fa-fire-flame-curved text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black font-title tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-200 to-amber-200 uppercase">
+                        ĐÈN KÉO QUÂN 3D
+                    </h1>
+                    <p class="text-xs text-zinc-400 font-medium">Hiệu ứng JavaScript • Rê chuột dừng đèn • Rê ra quay tiếp</p>
+                </div>
+            </div>
+
+            <!-- Trạng thái quay dạng badge -->
+            <div id="rotation-status-badge" class="px-3 py-1.5 text-xs rounded-full font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Đang quay tự động
+            </div>
+        </div>
+    </header>
+
+    <!-- KHU VỰC TRUNG TÂM: LỒNG ĐÈN KÉO QUÂN 3D -->
+    <main class="flex-1 flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
+        
+        <!-- Ánh sáng huyền ảo nền background -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+        <!-- Khung không gian 3D -->
+        <div class="stage-3d w-full max-w-lg h-[400px] flex items-center justify-center relative select-none">
+            
+            <!-- Ánh sáng phát từ tâm trục quay -->
+            <div class="absolute top-1/2 left-1/2 candle-glow w-40 h-40 rounded-full bg-amber-400/20 blur-2xl pointer-events-none z-0"></div>
+
+            <!-- Hộp 3D Carousel chứa 6 mặt -->
+            <div id="carouselBox" class="carousel-box z-10">
+                <!-- Mặt 1 -->
+                <div class="face face-1 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80" alt="Vịnh Hạ Long" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">1. Vịnh Hạ Long</span>
+                    </div>
+                </div>
+
+                <!-- Mặt 2 -->
+                <div class="face face-2 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80" alt="Phố cổ Hội An" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">2. Phố cổ Hội An</span>
+                    </div>
+                </div>
+
+                <!-- Mặt 3 -->
+                <div class="face face-3 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=600&q=80" alt="TP. Hồ Chí Minh" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">3. TP. Hồ Chí Minh</span>
+                    </div>
+                </div>
+
+                <!-- Mặt 4 -->
+                <div class="face face-4 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80" alt="Tràng An Ninh Bình" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">4. Tràng An Ninh Bình</span>
+                    </div>
+                </div>
+
+                <!-- Mặt 5 -->
+                <div class="face face-5 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80" alt="Cầu Vàng Đà Nẵng" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">5. Cầu Vàng Đà Nẵng</span>
+                    </div>
+                </div>
+
+                <!-- Mặt 6 -->
+                <div class="face face-6 bg-zinc-900 border-2 border-amber-500/50">
+                    <img src="https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=600&q=80" alt="Ruộng bậc thang Mù Cang Chải" class="w-full h-full object-cover pointer-events-none">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none"></div>
+                    <div class="absolute bottom-2.5 left-2.5 right-2.5 text-xs text-amber-200 pointer-events-none">
+                        <span class="font-medium bg-red-950/80 px-2 py-0.5 rounded border border-amber-500/40">6. Mù Cang Chải</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BẢNG ĐIỀU KHIỂN TỐC ĐỘ VÀ HƯỚNG XOAY -->
+        <div class="w-full max-w-xl bg-zinc-900/85 border border-zinc-800 rounded-2xl p-4 sm:p-5 mt-6 shadow-2xl backdrop-blur-md z-30">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
+                <span id="speed-label" class="text-xs text-zinc-300 font-medium">
+                    Tốc độ quay: <span id="speed-val" class="text-amber-400 font-mono">1.0x</span>
+                </span>
+                
+                <div class="flex items-center gap-2">
+                    <button id="toggle-play-btn" onclick="toggleRotationManual()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-red-700 hover:bg-red-600 text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-pause"></i> Tạm dừng
+                    </button>
+                    <button onclick="reverseRotation()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-rotate-left"></i> Đảo chiều
+                    </button>
+                </div>
+            </div>
+
+            <!-- Thanh trượt điều chỉnh tốc độ -->
+            <div class="mt-3.5 flex flex-col gap-1.5">
+                <div class="flex justify-between text-[11px] text-zinc-400">
+                    <span>Chậm</span>
+                    <span>Vừa</span>
+                    <span>Nhanh</span>
+                </div>
+                <input id="speedRange" type="range" min="0.2" max="2.5" step="0.1" value="1.0" class="w-full accent-red-600 bg-zinc-800 h-2 rounded-lg cursor-pointer">
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer tối giản -->
+    <footer class="border-t border-zinc-900 bg-zinc-950 py-3 px-4 text-center text-xs text-zinc-500">
+        <p>Đèn Kéo Quân 3D • JavaScript & CSS 3D Transforms</p>
+    </footer>
+
+    <!-- JAVASCRIPT ĐIỀU KHIỂN CHÍNH -->
+    <script>
+        const carousel = document.getElementById('carouselBox');
+        const statusBadge = document.getElementById('rotation-status-badge');
+        const faces = document.querySelectorAll('.face');
+
+        let currentAngle = 0;          // Góc xoay hiện tại (độ)
+        let baseSpeed = 0.45;          // Tốc độ góc cơ bản mỗi frame
+        let speedMultiplier = 1.0;     // Hệ số tốc độ
+        let rotationDirection = 1;     // 1: Quay thuận, -1: Quay nghịch
+        let isHovered = false;         // Đang rê chuột vào hình
+        let isManualPaused = false;    // Bấm tạm dừng thủ công
+
+        // Vòng lặp animation xoay đèn kéo quân
+        function animateLantern() {
+            // Khi chuột rê vào (isHovered = true) hoặc bấm tạm dừng -> ĐÈN DỪNG LẠI
+            if (!isHovered && !isManualPaused) {
+                currentAngle += (baseSpeed * speedMultiplier * rotationDirection);
+                carousel.style.transform = `rotateY(${currentAngle}deg)`;
+            }
+            requestAnimationFrame(animateLantern);
+        }
+
+        // Bắt sự kiện rê chuột vào từng mặt hình ảnh:
+        // ĐÈN CHỈ DỪNG LẠI, KHÔNG CÓ BẤT KỲ HIỆU ỨNG PHÓNG TO / GLOW NÀO
+        faces.forEach(face => {
+            // Rê chuột vào hình ảnh: Đèn dừng quay
+            face.addEventListener('mouseenter', () => {
+                isHovered = true;
+                updateStatusBadge(false, 'Đèn dừng (Đang rê chuột vào hình)');
+            });
+
+            // Rê chuột ra khỏi hình ảnh: Đèn quay tiếp
+            face.addEventListener('mouseleave', () => {
+                isHovered = false;
+                if (!isManualPaused) {
+                    updateStatusBadge(true, 'Đang quay tự động');
+                }
+            });
+        });
+
+        // Cập nhật trạng thái hiển thị
+        function updateStatusBadge(isRunning, message) {
+            if (isRunning) {
+                statusBadge.className = 'px-3 py-1.5 text-xs rounded-full font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2';
+                statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> ' + message;
+            } else {
+                statusBadge.className = 'px-3 py-1.5 text-xs rounded-full font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-2';
+                statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> ' + message;
+            }
+        }
+
+        // Bật / Tắt quay thủ công bằng nút bấm
+        function toggleRotationManual() {
+            const btn = document.getElementById('toggle-play-btn');
+            isManualPaused = !isManualPaused;
+            if (isManualPaused) {
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Tiếp tục quay';
+                btn.className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer';
+                updateStatusBadge(false, 'Đã tạm dừng');
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i> Tạm dừng';
+                btn.className = 'px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-red-700 hover:bg-red-600 text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer';
+                updateStatusBadge(true, 'Đang quay tự động');
+            }
+        }
+
+        // Đảo chiều quay
+        function reverseRotation() {
+            rotationDirection *= -1;
+        }
+
+        // Điều chỉnh vận tốc quay qua thanh Slider
+        const speedRange = document.getElementById('speedRange');
+        const speedVal = document.getElementById('speed-val');
+        speedRange.addEventListener('input', (e) => {
+            speedMultiplier = parseFloat(e.target.value);
+            speedVal.innerText = `${speedMultiplier.toFixed(1)}x`;
+        });
+
+        // Khởi động khi tải xong trang
+        window.onload = function() {
+            animateLantern();
+        };
+    </script>
+</body>
+</html>
